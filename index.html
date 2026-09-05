@@ -84,6 +84,18 @@
       background: var(--accent);
       color: #111;
     }
+    button.save-stone {
+      width: auto;
+      display: block;
+      margin: 10px auto 0;
+      padding: 8px 16px;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: var(--card);
+      color: var(--mute);
+      border: 1px solid var(--line);
+    }
     .out { margin-top: 36px; display: block; }
     .unicode {
       font-family: "Noto Sans Cuneiform", "Segoe UI Historic", serif;
@@ -677,6 +689,7 @@
           <div class="unicode">${uni}</div>
           <div class="syll">${syll}</div>
           <div class="seal ${skin}" aria-hidden="true">${imgs}</div>
+          <button type="button" class="save-stone" data-name="${escapeHtml(display)}">download stone</button>
           <p class="meaning">“${escapeHtml(meaning(item.parts))}”</p>
           <p class="gloss-note">poetic gloss</p>
           ${shown.length ? `<p class="notes warn">${escapeHtml(shown.join(". "))}</p>` : ""}
@@ -721,6 +734,56 @@
     const handNa = document.getElementById("hand-na");
     handNoto.addEventListener("click", () => setHand("signs", handNoto, handNa));
     handNa.addEventListener("click", () => setHand("signs-na", handNa, handNoto));
+
+    const SKIN_FILL = {
+      lapis: ["#243a63", "#121c30"],
+      onyx: ["#26262a", "#0c0c0d"],
+      jade: ["#1e3a30", "#0c1612"]
+    };
+
+    async function downloadStone(btn) {
+      const block = btn.closest(".block");
+      const seal = block && block.querySelector(".seal");
+      if (!seal) return;
+      const imgs = [...seal.querySelectorAll("img")];
+      if (!imgs.length) return;
+      try {
+        await Promise.all(imgs.map(im => im.decode ? im.decode() : Promise.resolve()));
+      } catch (e) {}
+      const H = 220, glyphH = 104, padX = 40, gap = 12;
+      const widths = imgs.map(im => {
+        const nh = im.naturalHeight || 1;
+        const nw = im.naturalWidth || 1;
+        return Math.max(24, Math.round(nw / nh * glyphH));
+      });
+      const W = padX * 2 + widths.reduce((a, b) => a + b, 0) + gap * Math.max(0, imgs.length - 1);
+      const canvas = document.createElement("canvas");
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d");
+      const skin = ["lapis", "onyx", "jade"].find(s => seal.classList.contains(s)) || "onyx";
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, SKIN_FILL[skin][0]);
+      g.addColorStop(1, SKIN_FILL[skin][1]);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+      let x = padX;
+      const y = Math.round((H - glyphH) / 2);
+      imgs.forEach((im, i) => {
+        ctx.drawImage(im, x, y, widths[i], glyphH);
+        x += widths[i] + gap;
+      });
+      const raw = (btn.getAttribute("data-name") || "seal").replace(/[^\w\-]+/g, "_").slice(0, 40);
+      const a = document.createElement("a");
+      a.href = canvas.toDataURL("image/png");
+      a.download = raw + "-stone.png";
+      a.click();
+    }
+
+    outEl.addEventListener("click", e => {
+      const btn = e.target.closest(".save-stone");
+      if (btn) downloadStone(btn);
+    });
   </script>
 </body>
 </html>
