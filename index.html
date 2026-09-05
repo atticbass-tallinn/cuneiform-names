@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cuneiform Names</title>
+  <style>
+    @font-face {
+      font-family: "Noto Sans Cuneiform";
+      src: url("fonts/NotoSansCuneiform-Regular.ttf") format("truetype");
+    }
+    :root {
+      --bg: #0e0e10;
+      --card: #17171b;
+      --line: #2a2a32;
+      --text: #ecece8;
+      --mute: #8b8b84;
+      --accent: #c9a24a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.45 system-ui, sans-serif;
+      display: grid;
+      place-items: start center;
+      padding: 48px 16px 80px;
+    }
+    main { width: min(520px, 100%); }
+    h1 {
+      font-size: 15px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--mute);
+      font-weight: 600;
+      margin: 0 0 24px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--mute);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin: 0 0 8px;
+    }
+    input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 14px 14px;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+    input:focus { outline: 1px solid var(--accent); }
+    button {
+      width: 100%;
+      margin-top: 8px;
+      border: 0;
+      border-radius: 10px;
+      padding: 14px;
+      background: var(--accent);
+      color: #111;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    button.hand {
+      width: auto;
+      display: inline-block;
+      margin: 0 4px;
+      padding: 6px 12px;
+      font-size: 11px;
+      background: var(--card);
+      color: var(--mute);
+      border: 1px solid var(--line);
+    }
+    button.hand.on {
+      background: var(--accent);
+      color: #111;
+    }
+    .out { margin-top: 36px; display: block; }
+    .unicode {
+      font-family: "Noto Sans Cuneiform", "Segoe UI Historic", serif;
+      font-size: 42px;
+      line-height: 1.6;
+      letter-spacing: .45em;
+      margin: 4px 0 20px;
+      padding: 0;
+      display: block;
+      background: none;
+      color: var(--text);
+      box-shadow: none;
+      border: 0;
+    }
+    .eq {
+      color: var(--mute);
+      font-size: 13px;
+      margin: 0 0 8px;
+    }
+    .syll {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      margin: 0 0 16px;
+      align-items: flex-start;
+    }
+    .syl {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 5.2em;
+      flex: 0 0 5.2em;
+    }
+    .syl .g {
+      font-family: "Noto Sans Cuneiform", "Segoe UI Historic", serif;
+      font-size: 28px;
+      line-height: 1.4;
+      height: 2.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .syl .r {
+      color: var(--mute);
+      font-size: 12px;
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
+    .syl .o {
+      color: #6a6a64;
+      font-size: 9px;
+      letter-spacing: 0;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+    .meaning { color: var(--mute); margin-bottom: 4px; }
+    .gloss-note {
+      margin: 0;
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #5c5c56;
+    }
+    .notes {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--mute);
+    }
+    .block + .block { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--line); }
+    .warn { color: #d4a017; }
+    .hint { color: var(--mute); font-size: 13px; margin: 0 0 22px; }
+    .seal {
+      margin: 28px auto 8px;
+      width: 100%;
+      height: 110px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 16px 22px;
+      overflow: hidden;
+      box-sizing: border-box;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.06),
+        inset 0 -2px 8px rgba(0,0,0,.45),
+        inset 0 0 28px rgba(0,0,0,.4),
+        0 8px 18px rgba(0,0,0,.28);
+    }
+    .seal img {
+      height: 52px;
+      width: auto;
+      max-height: 52px;
+      object-fit: contain;
+      flex: 0 1 auto;
+      min-width: 0;
+      filter:
+        brightness(0.78) contrast(1.2)
+        drop-shadow(1px 1px 0 rgba(0,0,0,.55))
+        drop-shadow(-1px -1px 0 rgba(255,255,255,.1));
+      opacity: 0.9;
+    }
+    .seal.lapis {
+      background: linear-gradient(160deg, #243a63 0%, #1a2a48 55%, #121c30 100%);
+    }
+    .seal.onyx {
+      background: linear-gradient(160deg, #26262a 0%, #161618 60%, #0c0c0d 100%);
+      color: rgba(200,200,196,.78);
+    }
+    .seal.jade {
+      background: linear-gradient(160deg, #1e3a30 0%, #14261f 58%, #0c1612 100%);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Cuneiform Names</h1>
+    <p class="hint">Type a name, then press generate. Open this file in a browser — a Drive/chat preview will not run it.</p>
+    <label for="name">name</label>
+    <input id="name" autocomplete="off" placeholder="Xenny" />
+    <label for="second">second name (optional)</label>
+    <input id="second" autocomplete="off" placeholder="" />
+    <button id="go" type="button">generate</button>
+    <p class="hint" style="margin-top:14px">stone hand
+      <button type="button" id="hand-noto" class="hand on">Noto</button>
+      <button type="button" id="hand-na" class="hand">NA</button>
+    </p>
+    <section class="out" id="out"></section>
+  </main>
+  <script>
+    const SIGNS = [
+      ["nam", "𒉆", "fate"],
+      ["tar", "𒋻", "cut / decree"],
+      ["kur", "𒆳", "mountain / land"],
+      ["bur", "𒁍", "release"],
+      ["sha", "𒊭", "that which"],
+      ["shi", "𒅆", "eye / face"],
+      ["shu", "𒋗", "hand"],
+      ["ush", "𒍑", "man / hero"],
+      ["yo", "𒍪", "to know"],
+      ["yu", "𒍪", "to know"],
+      ["pi", "𒁉", "that"],
+      ["pe", "𒁉", "that"],
+      ["che", "𒅆", "eye / face"],
+      ["chi", "𒍣", "life"],
+      ["cha", "𒊓", "bind"],
+      ["ak", "𒀝", "deed"],
+      ["an", "𒀭", "sky / god"],
+      ["ar", "𒅈", "glory"],
+      ["ah", "𒄴", "breath / spirit"],
+      ["ek", "𒅅", "closed deed"],
+      ["in", "𒅔", "seed / foundation"],
+      ["ir", "𒅕", "go / lead"],
+      ["un", "𒌦", "people / multitude"],
+      ["ur", "𒌨", "warrior"],
+      ["ud", "𒌓", "day / light"],
+      ["he", "𒄭", "so be it"],
+      ["hi", "𒄭", "so be it"],
+      ["ha", "𒄩", "abundance"],
+      ["hu", "𒄷", "bird"],
+      ["ba", "𒁀", "share"],
+      ["bi", "𒁉", "that"],
+      ["da", "𒁕", "strength beside"],
+      ["di", "𒁲", "judgment"],
+      ["de", "𒉈", "pour / speak"],
+      ["ge", "𒄀", "reed / true"],
+      ["gi", "𒄀", "reed / true"],
+      ["gu", "𒄞", "neck / lead"],
+      ["le", "𒇷", "hold"],
+      ["el", "𒂊", "house"],
+      ["en", "𒅔", "foundation"],
+      ["ne", "𒉈", "pour / speak"],
+      ["ma", "𒈠", "land"],
+      ["me", "𒈨", "being"],
+      ["am", "𒄠", "wild bull"],
+      ["te", "𒋼", "foundation"],
+      ["se", "𒋛", "fill"],
+      ["at", "𒀜", "father"],
+      ["id", "𒀉", "arm / strength"],
+      ["ga", "𒂵", "milk"],
+      ["vi", "𒉿", "water-sound"],
+      ["il", "𒅋", "lift"],
+      ["ul", "𒌌", "rise"],
+      ["er", "𒅕", "go / lead"],
+      ["re", "𒊑", "utter"],
+      ["ad", "𒀜", "father"],
+      ["ed", "𒂍", "house"],
+      ["ul", "𒌌", "rise"],
+      ["za", "𒍝", "stone gleam"],
+      ["zi", "𒍣", "life / breath"],
+      ["zu", "𒍪", "to know"],
+      ["ka", "𒅗", "word / mouth"],
+      ["ki", "𒆠", "earth / place"],
+      ["ku", "𒆪", "place down"],
+      ["la", "𒆷", "abundance"],
+      ["li", "𒇷", "press / hold"],
+      ["lu", "𒇻", "person"],
+      ["mi", "𒈬", "name / night"],
+      ["mu", "𒈬", "name / year"],
+      ["na", "𒈾", "stone"],
+      ["ni", "𒉌", "self"],
+      ["nu", "𒉡", "not"],
+      ["pu", "𒁍", "spring"],
+      ["pa", "𒁍", "spring"],
+      ["ra", "𒊏", "strike / ray"],
+      ["ri", "𒊑", "utter"],
+      ["ru", "𒊒", "set down"],
+      ["sa", "𒊓", "bind"],
+      ["si", "𒋛", "fill"],
+      ["su", "𒋢", "body"],
+      ["ta", "𒋫", "from"],
+      ["ti", "𒋾", "life"],
+      ["tu", "𒌅", "approach"],
+      ["va", "𒉿", "water-sound"],
+      ["ve", "𒉿", "water-sound"],
+      ["wa", "𒉿", "water-sound"],
+      ["we", "𒉿", "water-sound"],
+      ["du", "𒁺", "go"],
+      ["a", "𒀀", "water"],
+      ["e", "𒂊", "house"],
+      ["u", "𒌋", "growth"],
+      ["i", "𒉌", "self"]
+    ];
+
+    const KNOWN = {
+      xenny: "zi-e-ni",
+      ksenia: "ek-sa-e-ni-a",
+      kseniya: "ek-sa-e-ni-a",
+      alexander: "a-le-ek",
+      aleksandr: "a-le-ek",
+      penkuche: "pu-in-ku-shi",
+      ilja: "i-li-a",
+      ilya: "i-li-a",
+      redline: "ri-de-la-in",
+      timofey: "ti-mu-pu-e",
+      timofei: "ti-mu-pu-e",
+      ttypical: "ti-bi-ka-la",
+      pille: "bi-li-e",
+      neoondreed: "ni-un-ir",
+      grok: "gu-ru-ak",
+      agrok: "a-gu-ru-ak",
+      afuhra: "a-pu-ah-ra",
+      vexta: "ve-ek-sa-ta",
+      eva: "e-va",
+      claude: "ka-la-u-de",
+      elena: "e-le-na",
+      glen: "gi-le-in",
+      sofa: "su-pi-a",
+      wataru: "va-ta-ru",
+      yoshimoto: "yu-shi-mu-tu",
+      pikcauch: "pi-ka-ush",
+      anne: "an-ne",
+      sofia: "su-pi-a",
+      sophia: "su-pi-a",
+      sofiya: "su-pi-a",
+      sofya: "su-pi-a",
+      anna: "an-na",
+      ann: "an",
+      maria: "ma-ri-a",
+      mariya: "ma-ri-a",
+      mary: "ma-ri",
+      eva: "e-va",
+      varvara: "va-ar-va-ra",
+      barbara: "ba-ar-ba-ra",
+      mikhail: "mi-ha-il",
+      michael: "mi-ka-el",
+      alexander: "a-le-ek",
+      aleksandr: "a-le-ek",
+      alex: "a-le-ek",
+      artem: "ar-te-mu",
+      artyom: "ar-te-mu",
+      matvey: "ma-at-ve",
+      matvei: "ma-at-ve",
+      matthew: "ma-ti-u",
+      timofey: "ti-mu-pu-e",
+      dmitry: "di-mi-ri",
+      dmitriy: "di-mi-ri",
+      dmitri: "di-mi-ri",
+      olga: "ul-ga",
+      natalia: "na-ta-li-a",
+      natalya: "na-ta-li-a",
+      tatiana: "ta-ti-a-na",
+      tatyana: "ta-ti-a-na",
+      anastasia: "a-na-sa-ti-a",
+      anastasiya: "a-na-sa-ti-a",
+      victoria: "vi-ek-tu-ri",
+      viktoria: "vi-ek-tu-ri",
+      viktor: "vi-ek-tu-ur",
+      victor: "vi-ek-tu-ur",
+      vladimir: "va-la-di-mi-ir",
+      sergey: "se-er-ge",
+      sergei: "se-er-ge",
+      nikolai: "ni-ku-la-i",
+      nikolay: "ni-ku-la-i",
+      egor: "e-gu-ur",
+      ivan: "i-va-an",
+      john: "i-an",
+      jack: "i-ak",
+      james: "i-me-sa",
+      david: "da-vi-id",
+      daniel: "da-ni-el",
+      dan: "da-an",
+      liam: "li-am",
+      noah: "nu-a",
+      oliver: "u-li-ve-er",
+      emma: "e-ma",
+      olivia: "u-li-vi-a",
+      mia: "mi-a",
+      max: "ma-ak-sa",
+      maxim: "ma-ak-si-mu",
+      maksim: "ma-ak-si-mu",
+      kate: "ka-te",
+      ekaterina: "e-ka-te-ri-na",
+      katherine: "ka-te-ri-na",
+      nick: "ni-ek",
+      nikita: "ni-ki-ta",
+      sam: "sa-am",
+      mark: "ma-ar-ak",
+      lev: "le-ve",
+      leo: "le-u",
+      minato: "mi-na-tu",
+      himari: "hi-ma-ri",
+      rin: "ri-in",
+      hina: "hi-na",
+      yuna: "yu-na",
+      haruto: "ha-ru-tu",
+      ren: "re-en",
+      sora: "su-ra",
+      yuki: "yu-ki",
+      aoi: "a-u-i",
+      eino: "e-i-nu",
+      aino: "a-i-nu",
+      elias: "e-li-a-sa",
+      kadri: "ka-ad-ri",
+      mari: "ma-ri",
+      jaan: "i-an",
+      kati: "ka-ti",
+      matteo: "ma-te-u",
+      theo: "te-u",
+      emil: "e-mi-il",
+      hanna: "ha-an-na",
+      hannah: "ha-an-na",
+      mateo: "ma-te-u",
+      santiago: "sa-an-ti-a-gu",
+      valentina: "va-le-in-ti-na",
+      camila: "ka-mi-la",
+      muhammad: "mu-ha-ma-ad",
+      mohammed: "mu-ha-ma-ad",
+      ahmed: "ah-me-ed",
+      fatima: "pa-ti-ma",
+      aisha: "a-i-sha",
+      yusuf: "yu-su-pu",
+      omar: "u-ma-ar",
+      aarav: "a-ra-va",
+      arjun: "ar-zu-un",
+      ananya: "a-na-ni-a",
+      priya: "pi-ri-a",
+      amir: "a-mi-ir",
+      wei: "ve-i",
+      ming: "mi-in",
+      fang: "pa-an",
+      louise: "lu-i-sa",
+      louis: "lu-i",
+      jules: "zu-le-sa",
+      alice: "a-li-sa",
+      amelia: "a-me-li-a",
+      lily: "li-li",
+      arthur: "ar-tu-ur",
+      hugo: "hu-gu",
+      felix: "pe-li-ek",
+      paul: "pa-ul",
+      luca: "lu-ka",
+      luka: "lu-ka"
+    };
+
+    const CYR = {
+      а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ё:"e",ж:"zh",з:"z",и:"i",й:"i",
+      к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",
+      х:"h",ц:"c",ч:"ch",ш:"sh",щ:"sh",ъ:"",ы:"i",ь:"",э:"e",ю:"u",я:"a"
+    };
+
+    function toLatin(raw) {
+      return [...raw.toLowerCase().trim()].map(ch => CYR[ch] || ch).join("");
+    }
+
+    function normalize(s) {
+      let t = toLatin(s);
+      t = t.replace(/[^a-z]/g, "");
+      const notes = [];
+      const before = t;
+      t = t.replace(/tsch|tch/g, "ch");
+      t = t.replace(/ph/g, "f");
+      t = t.replace(/f/g, "p"); if (/f/.test(before) || /ph/.test(before)) notes.push("f → pu/p");
+      t = t.replace(/ks/g, "eksa");
+      t = t.replace(/x/g, "z"); if (/x/.test(before)) notes.push("x → zi");
+      t = t.replace(/w/g, "v");
+      t = t.replace(/q/g, "k");
+      t = t.replace(/yo/g, "yu");
+      t = t.replace(/ya/g, "ia");
+      t = t.replace(/y/g, "i");
+      t = t.replace(/oo/g, "u");
+      t = t.replace(/ee/g, "i");
+      t = t.replace(/ck/g, "k");
+      t = t.replace(/(.)\1+/g, "$1");
+      t = t.replace(/c([ei])/g, "s$1");
+      t = t.replace(/c/g, "k");
+      t = t.replace(/j/g, "i");
+      t = t.replace(/o/g, "u");
+      t = t.replace(/p(?![uiae])/g, "pu");
+      return { t, notes };
+    }
+
+    function parsePattern(pattern) {
+      return pattern.split("-").map(syl => {
+        const hit = SIGNS.find(([k]) => k === syl);
+        if (!hit) return { syl, sign: "?", gloss: "?", missing: true };
+        return { syl, sign: hit[1], gloss: hit[2], missing: false };
+      });
+    }
+
+    const FALLBACK = {
+      b: ["bi", "𒁉", "that"],
+      d: ["di", "𒁲", "judgment"],
+      g: ["gi", "𒄀", "reed / true"],
+      k: ["ki", "𒆠", "earth / place"],
+      l: ["li", "𒇷", "hold"],
+      m: ["mu", "𒈬", "name"],
+      n: ["in", "𒅔", "foundation"],
+      p: ["pu", "𒁍", "spring"],
+      r: ["ri", "𒊑", "utter"],
+      s: ["sa", "𒊓", "bind"],
+      t: ["ti", "𒋾", "life"],
+      z: ["zi", "𒍣", "life / breath"],
+      h: ["ah", "𒄴", "breath / spirit"],
+      v: ["va", "𒉿", "water-sound"]
+    };
+
+    const SIGNS_BY_LEN = SIGNS.slice().sort((a, b) => b[0].length - a[0].length);
+    const SIGNS_BY_START = {};
+    for (const row of SIGNS_BY_LEN) {
+      const c = row[0][0];
+      (SIGNS_BY_START[c] || (SIGNS_BY_START[c] = [])).push(row);
+    }
+
+    function greedy(t) {
+      const out = [];
+      let i = 0;
+      while (i < t.length) {
+        let hit = null;
+        const bucket = SIGNS_BY_START[t[i]] || [];
+        for (const row of bucket) {
+          if (t.startsWith(row[0], i)) { hit = row; break; }
+        }
+        if (hit) {
+          out.push({ syl: hit[0], sign: hit[1], gloss: hit[2], missing: false });
+          i += hit[0].length;
+        } else if (FALLBACK[t[i]]) {
+          const fb = FALLBACK[t[i]];
+          out.push({ syl: fb[0], sign: fb[1], gloss: fb[2], missing: false, replaced: t[i] });
+          i += 1;
+        } else {
+          out.push({ syl: t[i], sign: "?", gloss: "unmapped", missing: true });
+          i += 1;
+        }
+      }
+      return out;
+    }
+
+    function convert(raw) {
+      const key = toLatin(raw).replace(/[^a-z]/g, "");
+      if (KNOWN[key]) {
+        const parts = parsePattern(KNOWN[key]);
+        const { t } = normalize(raw);
+        const greedyPath = greedy(t).map(p => p.syl).join("-");
+        const note = greedyPath === KNOWN[key]
+          ? "1 known = greedy"
+          : "1 known override ≠ " + greedyPath;
+        return { parts, notes: [note], raw };
+      }
+      const { t, notes } = normalize(raw);
+      const parts = greedy(t);
+      if (parts.some(p => p.replaced)) notes.push("3 letter fallback");
+      notes.unshift("2 longest syllable");
+      return { parts, notes, raw };
+    }
+
+    const PHRASES = {
+      "zi-e-ni": "life in the house",
+      "ek-sa-e-ni-a": "deed binds the house",
+      "a-le-ek": "water holds the deed",
+      "a-pu-ah-ra": "spring of living breath",
+      "e-le-na": "house holds stone",
+      "gi-le-in": "true hold",
+      "su-pi-a": "body of the spring",
+      "an-na": "sky · stone",
+      "an-ne": "sky · house",
+      "e-va": "house · water",
+      "va-ta-ru": "water set down",
+      "yu-shi-mu-tu": "knowing eye",
+      "pi-ka-ush": "hero’s spring",
+      "gu-ru-ak": "lead the deed",
+      "a-gu-ru-ak": "water leads",
+      "ti-mu-pu-e": "living spring",
+      "ti-bi-ka-la": "life speaks",
+      "bi-li-e": "holds the house",
+      "ni-un-ir": "leads the many",
+      "pu-in-ku-shi": "spring · eye",
+      "ri-de-la-in": "poured speech",
+      "i-li-a": "self holds water",
+      "ma-ri-a": "spoken land",
+      "mi-ha-il": "name lifts",
+      "ar-te-mu": "glory named",
+      "ma-at-ve": "father’s land",
+      "di-mi-ri": "named judgment",
+      "ul-ga": "it rises",
+      "nu-a": "clear name",
+      "li-am": "wild strength",
+      "mu-ha-ma-ad": "named father",
+      "pa-ti-ma": "life-land spring",
+      "yu-su-pu": "known spring",
+      "ha-ru-tu": "abundance nears",
+      "mi-na-tu": "named stone"
+    };
+
+    const OSL = {
+      a:["A","U+12000"], e:["E","U+1208A"], u:["U","U+1230B"], i:["NI","U+1224C"],
+      ba:["BA","U+12040"], bi:["BI","U+12049"], da:["DA","U+12055"], di:["DI","U+12072"],
+      de:["NE","U+12248"], ne:["NE","U+12248"], ge:["GI","U+12100"], gi:["GI","U+12100"],
+      gu:["GUD","U+1211E"], za:["ZA","U+1235D"], zi:["ZI","U+12363"], zu:["ZU","U+1236A"],
+      yo:["ZU","U+1236A"], yu:["ZU","U+1236A"], ka:["KA","U+12157"], ki:["KI","U+121A0"],
+      ku:["KU","U+121AA"], la:["LA","U+121B7"], le:["LI","U+121F7"], li:["LI","U+121F7"],
+      lu:["LU","U+121FB"], ma:["MA","U+12220"], me:["ME","U+12228"], mi:["MU","U+1222C"],
+      mu:["MU","U+1222C"], na:["NA","U+1223E"], ni:["NI","U+1224C"], nu:["NU","U+12261"],
+      pu:["BU","U+1204D"], pa:["BU","U+1204D"], ra:["RA","U+1228F"], ri:["RI","U+12291"],
+      re:["RI","U+12291"], ru:["RU","U+12292"], sa:["SA","U+12293"], se:["SI","U+122DB"],
+      si:["SI","U+122DB"], su:["SU","U+122E2"], ta:["TA","U+122EB"], te:["TE","U+122FC"],
+      ti:["TI","U+122FE"], tu:["TU","U+12305"], ha:["HA","U+12129"], he:["HI","U+1212D"],
+      hi:["HI","U+1212D"], hu:["HU","U+12137"], sha:["SHA","U+122AD"], shi:["IGI","U+12146"],
+      shu:["SHU","U+122D7"], che:["IGI","U+12146"], chi:["ZI","U+12363"], cha:["SA","U+12293"],
+      pi:["BI","U+12049"], pe:["BI","U+12049"], va:["PI","U+1227F"], ve:["PI","U+1227F"],
+      vi:["PI","U+1227F"], wa:["PI","U+1227F"], we:["PI","U+1227F"], du:["DU","U+1207A"],
+      ga:["GA","U+120B5"], am:["AM","U+12120"], ak:["AK","U+1201D"], an:["AN","U+1202D"],
+      ar:["AR","U+12148"], ah:["AH","U+12134"], ek:["IG","U+12145"], in:["IN","U+12154"],
+      en:["IN","U+12154"], ir:["IR","U+12155"], er:["IR","U+12155"], un:["UN","U+12326"],
+      ur:["UR","U+12328"], ud:["UD","U+12313"], tar:["TAR","U+122FB"], nam:["NAM","U+12246"],
+      kur:["KUR","U+121B3"], bur:["BU","U+1204D"], ush:["USH","U+12351"], at:["AD","U+1201C"],
+      ad:["AD","U+1201C"], id:["A2","U+12009"], il:["IL","U+1214B"], ul:["U.GUD","U+1230C"],
+      el:["E","U+1208A"], ed:["E2","U+1208D"]
+    };
+
+    function meaning(parts) {
+      const key = parts.map(p => p.syl).join("-");
+      if (PHRASES[key]) return PHRASES[key];
+      const words = parts.filter(p => !p.missing).map(p => p.gloss.split("/")[0].trim());
+      if (!words.length) return "—";
+      if (words.length === 1) return words[0];
+      if (words.length === 2) return words[0] + " and " + words[1];
+      return words.join(" · ");
+    }
+
+    function safeSyl(s) {
+      return /^[a-z]+$/.test(s || "") ? s : "";
+    }
+
+    function renderName(item) {
+      const display = item.raw.trim();
+      const uni = item.parts.map(p => escapeHtml(p.sign)).join("");
+      const syll = item.parts.map(p => {
+        const syl = safeSyl(p.syl);
+        const meta = syl && OSL[syl];
+        const tag = meta ? `${escapeHtml(meta[0])} ${escapeHtml(meta[1])}` : "";
+        return `<span class="syl"><span class="g">${escapeHtml(p.sign)}</span><span class="r">${escapeHtml(p.syl)}</span>${tag ? `<span class="o">${tag}</span>` : ""}</span>`;
+      }).join("");
+      const long = item.parts.length > 6;
+      const miss = item.parts.filter(p => p.missing);
+      const notes = [];
+      if (item.notes.length) notes.push(item.notes.join("; "));
+      if (miss.length) notes.push("unmapped: " + miss.map(p => p.syl).join(", "));
+      if (long) notes.push("too long for a seal — shorten the reading");
+      const shown = notes.filter(n => n.startsWith("unmapped") || n.indexOf("too long") !== -1);
+      const skins = ["lapis", "onyx", "jade"];
+      const skin = skins[display.length % 3];
+      const imgs = item.parts.map(p => {
+        const syl = safeSyl(p.syl);
+        if (!syl || p.missing) return "";
+        return `<img src="${SEAL_DIR}/${syl}.png" alt="${escapeHtml(syl)}" />`;
+      }).join("");
+      return `
+        <div class="block">
+          <div class="eq">${escapeHtml(display)}</div>
+          <div class="unicode">${uni}</div>
+          <div class="syll">${syll}</div>
+          <div class="seal ${skin}" aria-hidden="true">${imgs}</div>
+          <p class="meaning">“${escapeHtml(meaning(item.parts))}”</p>
+          <p class="gloss-note">poetic gloss</p>
+          ${shown.length ? `<p class="notes warn">${escapeHtml(shown.join(". "))}</p>` : ""}
+        </div>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
+    }
+
+    const nameEl = document.getElementById("name");
+    const secondEl = document.getElementById("second");
+    const outEl = document.getElementById("out");
+    const go = document.getElementById("go");
+    let SEAL_DIR = "signs";
+    function setHand(dir, onBtn, offBtn) {
+      SEAL_DIR = dir;
+      onBtn.classList.add("on");
+      offBtn.classList.remove("on");
+      if (nameEl.value.trim()) run();
+    }
+
+    function run() {
+      const a = nameEl.value.trim();
+      const b = secondEl.value.trim();
+      if (!a) {
+        outEl.innerHTML = '<p class="notes warn">type a name first</p>';
+        outEl.classList.add("show");
+        return;
+      }
+      let html = renderName(convert(a));
+      if (b && b.toLowerCase() !== a.toLowerCase()) html += renderName(convert(b));
+      outEl.innerHTML = html;
+      outEl.classList.add("show");
+    }
+
+    window.run = run;
+    go.addEventListener("click", run);
+    nameEl.addEventListener("keydown", e => { if (e.key === "Enter") run(); });
+    secondEl.addEventListener("keydown", e => { if (e.key === "Enter") run(); });
+    const handNoto = document.getElementById("hand-noto");
+    const handNa = document.getElementById("hand-na");
+    handNoto.addEventListener("click", () => setHand("signs", handNoto, handNa));
+    handNa.addEventListener("click", () => setHand("signs-na", handNa, handNoto));
+  </script>
+</body>
+</html>
