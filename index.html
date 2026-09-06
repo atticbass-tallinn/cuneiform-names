@@ -28,7 +28,7 @@
       place-items: start center;
       padding: 48px 16px 80px;
     }
-    main { width: min(520px, 100%); }
+    main { width: min(640px, 100%); }
     h1 {
       font-size: 15px;
       letter-spacing: .14em;
@@ -167,6 +167,23 @@
     .block + .block { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--line); }
     .warn { color: #d4a017; }
     .hint { color: var(--mute); font-size: 13px; margin: 0 0 22px; }
+    .blurb {
+      color: var(--mute);
+      font-size: 14px;
+      line-height: 1.55;
+      margin: 0 0 18px;
+    }
+    .blurb strong { color: var(--text); font-weight: 600; }
+    .hook { margin: 0 0 4px; }
+    .hook-ru { margin: 0 0 18px; color: #6a6a64; }
+    .seal.preview { margin-bottom: 28px; }
+    .seal.preview .roll {
+      color: rgba(232,220,186,.38);
+      font-size: 13px;
+      letter-spacing: .16em;
+      text-transform: lowercase;
+    }
+    .about { margin-top: 48px; }
     .seal {
       margin: 28px auto 8px;
       width: 100%;
@@ -184,6 +201,12 @@
         inset 0 -2px 8px rgba(0,0,0,.45),
         inset 0 0 28px rgba(0,0,0,.4),
         0 8px 18px rgba(0,0,0,.28);
+    }
+    .seal .seal-g {
+      font-family: "Noto Sans Cuneiform", "Segoe UI Historic", serif;
+      font-size: 42px;
+      line-height: 1;
+      color: #e8dcb8;
     }
     .seal img {
       height: 52px;
@@ -223,7 +246,9 @@
 <body>
   <main>
     <h1>Cuneiform Names</h1>
-    <p class="hint">Type a name, then press generate. Open this file in a browser — a Drive/chat preview will not run it.</p>
+    <p class="blurb hook">Your name. A clay seal.</p>
+    <p class="blurb hook-ru">Имя на глиняной печати.</p>
+    <div id="preview" class="seal jade preview"><span class="roll">roll your name</span></div>
     <label for="name">name</label>
     <input id="name" autocomplete="off" placeholder="Мария" />
     <label for="second">dj name</label>
@@ -234,6 +259,11 @@
       <button type="button" id="hand-na" class="hand">NA</button>
     </p>
     <section class="out" id="out"></section>
+    <div class="about">
+      <p class="blurb">Write a given name and a DJ name. The page turns them into <strong>Sumerian syllables</strong> and real cuneiform signs — not a fantasy alphabet.</p>
+      <p class="blurb">What you get, in order: the Unicode line, each syllable with its official sign name and code, a stone band of those signs, then a short phrase. The phrase is a <strong>poetic gloss</strong>, not a translation of the name.</p>
+      <p class="blurb">Noto is the catalog hand. NA is the Neo-Assyrian hand — same signs, older clay. Download saves the band as a picture. Signs follow Oracc OSL. This is a seal toy from Attic Bass, Tallinn — not a museum edition.</p>
+    </div>
   </main>
   <footer class="credit">
     attic bass · tallinn
@@ -696,7 +726,7 @@
       const imgs = item.parts.map(p => {
         const syl = safeSyl(p.syl);
         if (!syl || p.missing) return "";
-        return `<img src="${SEAL_DIR}/${syl}.png" alt="${escapeHtml(syl)}" />`;
+        return `<img src="${SEAL_DIR}/${syl}.png" alt="${escapeHtml(syl)}" data-sign="${escapeHtml(p.sign)}" onerror="var s=document.createElement('span');s.className='seal-g';s.textContent=this.getAttribute('data-sign');this.replaceWith(s);" />`;
       }).join("");
       return `
         <div class="block">
@@ -718,6 +748,7 @@
     const nameEl = document.getElementById("name");
     const secondEl = document.getElementById("second");
     const outEl = document.getElementById("out");
+    const previewEl = document.getElementById("preview");
     const go = document.getElementById("go");
     let SEAL_DIR = "signs";
     function setHand(dir, onBtn, offBtn) {
@@ -733,12 +764,14 @@
       if (!a) {
         outEl.innerHTML = '<p class="notes warn">type a name first</p>';
         outEl.classList.add("show");
+        if (previewEl) previewEl.style.display = "";
         return;
       }
       let html = renderName(convert(a));
       if (b && b.toLowerCase() !== a.toLowerCase()) html += renderName(convert(b));
       outEl.innerHTML = html;
       outEl.classList.add("show");
+      if (previewEl) previewEl.style.display = "none";
     }
 
     window.run = run;
